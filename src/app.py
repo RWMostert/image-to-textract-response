@@ -77,7 +77,8 @@ def save_response(textract_response: dict, bucket_name: str, key: str, metadata:
 
     :param textract_response: The textract response to be stored.
     :param bucket_name: The S3 bucket in which to store the response.
-    :param file_name: The filename of the response to use when storing it.
+    :param key: The key of the response to use when storing it.
+    :param metadata: Any metadata to store on the S3 object.
     :return:
     """
     json_array = json.dumps(textract_response)
@@ -89,11 +90,10 @@ def save_response(textract_response: dict, bucket_name: str, key: str, metadata:
     )
 
 
-# --------------- Main handler ------------------
 def lambda_handler(event, context):
     '''
-    Uses Rekognition APIs to detect text and labels for objects uploaded to S3
-    and store the content in DynamoDB.
+    Uses Textract APIs to detect text and tables for image objects uploaded to an origin S3 bucket
+    and store the response in a destination S3 bucket.
     '''
     # Log the the received event locally.
     # print("Received event: " + json.dumps(event, indent=2))

@@ -1,0 +1,36 @@
+AWSTemplateFormatVersion: '2010-09-09'
+Transform: 'AWS::Serverless-2016-10-31'
+
+Description: SAM app that uses the Textract API to detect text and tables in S3 Objects and stores the JSON response in an output S3 bucket.
+
+Resources:
+  DetectTextInImage:
+    Type: 'AWS::Serverless::Function'
+    Properties:
+      Handler: src/app.lambda_handler
+      Runtime: python3.7
+      CodeUri: .
+      Description: Uses Textract API to detect text and tables in S3 Objects and stores the JSON response in an output S3 bucket.
+      MemorySize: 512
+      Timeout: 30
+      Environment:
+        Variables:
+          DESTINATION_TEXTRACTRESPONSE_BUCKET:
+            Ref: DestinationTextractResponseBucket
+      Policies:
+        - Version: '2012-10-17'
+          Statement:
+            - Effect: Allow
+              Action:
+                - 's3:GetObject'
+                - 's3:PutObject'
+              Resource: 'arn:aws:s3:::*'
+            - Effect: Allow
+              Action:
+                - 'textract:AnalyzeDocument'
+                - 'textract:DetectDocumentText'
+              Resource: '*'
+
+  DestinationTextractResponseBucket:
+    # AWS CloudFormation resource to create an S3 bucket
+    Type: 'AWS::S3::Bucket'
